@@ -1,6 +1,10 @@
 import streamlit as st
 import subprocess
-from query import ask_question
+import sys
+import importlib
+import query
+
+importlib.reload(query)
 
 # --------------------------------------------------
 # PAGE CONFIG
@@ -16,6 +20,8 @@ st.set_page_config(
 # --------------------------------------------------
 # CUSTOM CSS
 # --------------------------------------------------
+
+print("MAIN FILE STARTED")
 
 st.markdown("""
 <style>
@@ -103,18 +109,13 @@ with st.sidebar:
 
     st.divider()
 
-    # st.markdown("### Navigation")
-
-    # st.button("Embed Documents")
-    # st.divider()
-
     if st.button("Ingest Documents"):
 
         try:
             with st.spinner("Creating embeddings..."):
 
                 subprocess.run(
-                    ["python", "ingest.py"],
+                    [sys.executable, "ingest.py"],
                     check=True
                 )
 
@@ -173,7 +174,7 @@ if question:
 
             try:
 
-                answer = ask_question(question)
+                answer = query.ask_question(question)
 
             except Exception as e:
 

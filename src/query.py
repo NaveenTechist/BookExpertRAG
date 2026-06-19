@@ -1,58 +1,82 @@
 import chromadb
-import google.generativeai as genai
-from config import GEMINI_API_KEY
-from dotenv import load_dotenv
 import os
+from pathlib import Path
+BASE_DIR = Path(__file__).resolve().parent.parent
 
-load_dotenv()
+from dotenv import load_dotenv
+from google import genai
+
+load_dotenv(BASE_DIR / ".env")
 
 DATABASE_LOCATION = os.getenv("DATABASE_LOCATION")
+if DATABASE_LOCATION and not os.path.isabs(DATABASE_LOCATION):
+    DATABASE_LOCATION = str((BASE_DIR / DATABASE_LOCATION).resolve())
 COLLECTION_NAME = os.getenv("COLLECTION_NAME")
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 EMBEDDING_MODEL = os.getenv("EMBEDDING_MODEL")
 CHAT_MODEL = os.getenv("CHAT_MODEL")
 
-client = chromadb.PersistentClient(
-    path=DATABASE_LOCATION
+client_ai = genai.Client(api_key=GEMINI_API_KEY)
+
+db = chromadb.PersistentClient(
+path=DATABASE_LOCATION
 )
 
-collection = client.get_collection(
-    COLLECTION_NAME
+collection = db.get_collection(
+name=COLLECTION_NAME
 )
+
+def embed_query(query):
+    response = client_ai.models.embed_content(
+        model=EMBEDDING_MODEL,
+        contents=query
+    )
+
+    return response.embeddings[0].values
+
 
 def search(query):
+    query_embedding = embed_query(query)
+
     results = collection.query(
-        query_texts=[query],
-        n_results=3,
-        include=["documents","distances"]
+        query_embeddings=[query_embedding],
+        n_results=5,
+        include=["documents", "metadatas", "distances"]
     )
     return results
 
 
-
-genai.configure(api_key=GEMINI_API_KEY)  # Here connection LLM MOdel
-
-model = genai.GenerativeModel(
-    CHAT_MODEL
-)
-
-def ask_question(question): # GENERATING ANSWERS HERE WITH OUR LLM GEMINI
-
+def ask_question(question):
     results = search(question)
-    context = "\n\n".join(
-        results["documents"][0]
+
+    context_parts = []
+    if results and "documents" in results and results["documents"]:
+        documents = results["documents"][0]
+        metadatas = results.get("metadatas", [[]])[0] if results.get("metadatas") else []
+        for i, doc in enumerate(documents):
+            meta = metadatas[i] if i < len(metadatas) else {}
+            source = meta.get("source", "Unknown")
+            page = meta.get("page", "Unknown")
+            context_parts.append(f"--- Chunk {i+1} [Source: {source}, Page: {page}] ---\n{doc}")
+    
+    context = "\n\n".join(context_parts)
+
+    prompt = f"""You are a highly accurate document QA assistant.
+Answer the user's question ONLY using the provided context chunks.
+Do not assume, extrapolate, or use outside knowledge.
+If the context does not contain the answer, reply exactly:
+I cannot find the answer in the provided documents.
+
+Context chunks:
+{context}
+
+Question: {question}
+Answer:"""
+
+    response = client_ai.models.generate_content(
+        model=CHAT_MODEL,
+        contents=prompt
     )
-    prompt = f"""
-    You are a document QA assistant.
-    Answer ONLY using the provided context.
-    If the answer is not explicitly present in the context,
-    reply exactly:
-    "I cannot find the answer in the provided documents."
-    Context:
-    {context}
-    Question:
-    {question}
-    """
-    response = model.generate_content(prompt)
 
     return response.text
+
