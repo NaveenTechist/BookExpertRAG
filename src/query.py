@@ -17,6 +17,7 @@ COLLECTION_NAME = os.getenv("COLLECTION_NAME")
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 EMBEDDING_MODEL = os.getenv("EMBEDDING_MODEL")
 CHAT_MODEL = os.getenv("CHAT_MODEL")
+INGEST_FILE = Path(__file__).parent / "ingest.py"
 
 client_ai = genai.Client(api_key=GEMINI_API_KEY)
 
@@ -34,7 +35,7 @@ except Exception:
     print("Collection not found. Running ingest.py...")
 
     subprocess.run(
-        ["python", "ingest.py"],
+        ["python", str(INGEST_FILE)],
         check=True
     )
 
