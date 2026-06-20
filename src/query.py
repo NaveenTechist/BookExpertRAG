@@ -2,7 +2,8 @@ import chromadb
 import os
 from pathlib import Path
 import subprocess
-import chromadb
+import sys
+
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 from dotenv import load_dotenv
@@ -35,7 +36,7 @@ except Exception:
     print("Collection not found. Running ingest.py...")
 
     subprocess.run(
-        ["python", str(INGEST_FILE)],
+        [sys.executable, str(INGEST_FILE)],
         check=True
     )
 

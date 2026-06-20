@@ -2,7 +2,10 @@ import streamlit as st
 import subprocess
 import sys
 import importlib
+from pathlib import Path
 import query
+
+INGEST_FILE = Path(__file__).parent / "ingest.py"
 
 importlib.reload(query)
 
@@ -115,7 +118,7 @@ with st.sidebar:
             with st.spinner("Creating embeddings..."):
 
                 subprocess.run(
-                    [sys.executable, "ingest.py"],
+                    [sys.executable, str(INGEST_FILE)],
                     check=True
                 )
 

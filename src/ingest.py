@@ -20,6 +20,11 @@ COLLECTION_NAME = os.getenv("COLLECTION_NAME")
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 EMBEDDING_MODEL = os.getenv("EMBEDDING_MODEL")
 
+print("INGEST STARTED")
+print("DATA_DIR =", DATA_DIR)
+print("DB =", DATABASE_LOCATION)
+print("COLLECTION =", COLLECTION_NAME)
+
 client_ai = genai.Client(api_key=GEMINI_API_KEY)
 
 db = chromadb.PersistentClient(path=DATABASE_LOCATION)
