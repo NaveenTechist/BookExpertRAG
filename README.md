@@ -304,10 +304,6 @@ This application can be deployed on:
 
 * Streamlit Community Cloud
 * Render
-* Railway
-* Azure App Service
-* AWS
-* Docker-based environments
 
 Required deployment secrets:
 
@@ -337,4 +333,5 @@ Naveen Yarramsetti
 
 App Link: https://bookexpertrag-5r26c3gxhmpjbfzybby4vp.streamlit.app/
 
-Built using Streamlit, ChromaDB, and Google Gemini.
+Built using Streamlit, ChromaDB, and Google Gemini. 
+
