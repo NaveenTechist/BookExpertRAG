@@ -24,12 +24,17 @@ client_ai = genai.Client(api_key=GEMINI_API_KEY)
 
 db = chromadb.PersistentClient(path=DATABASE_LOCATION)
 
-try:
-    db.delete_collection(COLLECTION_NAME)
-except:
-    pass
+collection = db.get_or_create_collection(
+    name=COLLECTION_NAME
+)
 
-collection = db.get_or_create_collection(name=COLLECTION_NAME)
+if collection.count() > 0:
+    print(
+        f"Collection already exists with "
+        f"{collection.count()} documents"
+    )
+    exit()
+
 
 def extract_pdf(file_path):
     pages = []

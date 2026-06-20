@@ -1,6 +1,8 @@
 import chromadb
 import os
 from pathlib import Path
+import subprocess
+import chromadb
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 from dotenv import load_dotenv
@@ -19,12 +21,26 @@ CHAT_MODEL = os.getenv("CHAT_MODEL")
 client_ai = genai.Client(api_key=GEMINI_API_KEY)
 
 db = chromadb.PersistentClient(
-path=DATABASE_LOCATION
+    path=DATABASE_LOCATION
 )
 
-collection = db.get_collection(
-name=COLLECTION_NAME
-)
+try:
+    collection = db.get_collection(
+        name=COLLECTION_NAME
+    )
+
+except Exception:
+
+    print("Collection not found. Running ingest.py...")
+
+    subprocess.run(
+        ["python", "ingest.py"],
+        check=True
+    )
+
+    collection = db.get_collection(
+        name=COLLECTION_NAME
+    )
 
 def embed_query(query):
     response = client_ai.models.embed_content(
