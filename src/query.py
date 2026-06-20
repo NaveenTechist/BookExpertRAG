@@ -75,21 +75,36 @@ def ask_question(question):
             meta = metadatas[i] if i < len(metadatas) else {}
             source = meta.get("source", "Unknown")
             page = meta.get("page", "Unknown")
-            context_parts.append(f"--- Chunk {i+1} [Source: {source}, Page: {page}] ---\n{doc}")
+            context_parts.append(
+                f"[Source: {source}, Page: {page}]\n{doc}"
+            )
     
     context = "\n\n".join(context_parts)
 
-    prompt = f"""You are a highly accurate document QA assistant.
-Answer the user's question ONLY using the provided context chunks.
-Do not assume, extrapolate, or use outside knowledge.
-If the context does not contain the answer, reply exactly:
-I cannot find the answer in the provided documents.
+    prompt = f"""
+    You are a highly accurate document QA assistant.
+    Answer ONLY using the provided context chunks.
+    Rules:
+    1. Do not use outside knowledge.
+    2. Do not make assumptions.
+    3. Every factual statement MUST include a citation.
+    4. Use citations exactly in this format:
 
-Context chunks:
-{context}
+    (Source: filename, Page: page_number)
 
-Question: {question}
-Answer:"""
+    Example:
+    The system supports SMS notifications.
+    (Source: RMAS.pdf, Page: 23)
+
+    If the answer is not present in the context, reply exactly:
+    I cannot find the answer in the provided documents.
+
+    Context:
+    {context}
+    Question:
+    {question}
+    Answer:
+    """
 
     response = client_ai.models.generate_content(
         model=CHAT_MODEL,
