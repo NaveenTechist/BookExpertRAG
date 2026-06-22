@@ -143,9 +143,7 @@ st.caption(
 
 st.divider()
 
-# --------------------------------------------------
 # CHAT HISTORY
-# --------------------------------------------------
 
 for msg in st.session_state.messages:
 
@@ -153,9 +151,7 @@ for msg in st.session_state.messages:
 
         st.markdown(msg["content"])
 
-# --------------------------------------------------
 # FIXED CHAT INPUT
-# --------------------------------------------------
 
 question = st.chat_input(
     "Ask about your documents..."
@@ -167,27 +163,17 @@ if question:
         "role":"user",
         "content":question
     })
-
     with st.chat_message("user"):
         st.markdown(question)
-
     with st.chat_message("assistant"):
-
         with st.spinner("Searching documents..."):
-
             try:
-
                 answer = query.ask_question(question)
-
             except Exception as e:
-
                 answer = f"Error: {str(e)}"
-
         st.markdown(answer)
-
     st.session_state.messages.append({
         "role":"assistant",
         "content":answer
     })
-
     st.rerun()

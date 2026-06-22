@@ -243,18 +243,18 @@ http://localhost:8501
 
 ## Home Interface
 
-![RAG Interface](RAG%20image-0.png)
+![RAG Interface](/images/rag-image-0.png)
 
 ---
 
 ## RAG Responses
 
-![RAG Responses](RAG%20image-1.png)
+![RAG Responses](images/rag-image-1.png)
 
 ---
 
 
-![RAG Response](RAG%20image-2.png)
+![RAG Response](images/rag-image-2.png)
 
 ---
 

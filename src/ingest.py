@@ -14,8 +14,10 @@ load_dotenv(BASE_DIR / ".env")
 DATA_DIR = BASE_DIR / "data"
 
 DATABASE_LOCATION = os.getenv("DATABASE_LOCATION")
+
 if DATABASE_LOCATION and not os.path.isabs(DATABASE_LOCATION):
     DATABASE_LOCATION = str((BASE_DIR / DATABASE_LOCATION).resolve())
+    
 COLLECTION_NAME = os.getenv("COLLECTION_NAME")
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 EMBEDDING_MODEL = os.getenv("EMBEDDING_MODEL")
@@ -113,16 +115,11 @@ def chunk_text(text, chunk_size=1000, overlap=200):
 def create_chunks(pages):
     chunk_docs = []
 
-
     for page in pages:
-
         for chunk in chunk_text(page["text"]):
-
             chunk = chunk.strip()
-
             if len(chunk) < 10:
                 continue
-
             chunk_docs.append({
                 "text": chunk,
                 "metadata": page["metadata"]
@@ -164,8 +161,6 @@ def save_chunks(chunks):
     )
 
 if __name__ == "__main__":
-
-
     pages = []
     for file in os.listdir(DATA_DIR):
         path = DATA_DIR / file
